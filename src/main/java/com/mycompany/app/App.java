@@ -25,6 +25,21 @@ public class App {
 
             System.out.println(maxDepth(tree.root));
         }
+//        tree.add(new Integer(6));
+//        tree.add(new Integer(22));
+//        tree.add(new Integer(5));
+//        tree.add(new Integer(0));
+//        tree.add(new Integer(44));
+//        tree.add(new Integer(75));
+//        tree.add(new Integer(33));
+//        tree.add(new Integer(101));
+//        tree.add(new Integer(17));
+//        tree.add(new Integer(19));
+//            System.out.print("{");
+//            tree.print();
+//            System.out.println("}");
+//
+//            System.out.println(maxDepth(tree.root));
 
     }
 

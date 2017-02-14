@@ -20,41 +20,43 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T> {
 	}
 
 	public void add(T element) {
-		insert(element, root);
+//		insert(element, root);
+                
+                Node<T> current = root;
+                boolean added = false;
+                while (!added) {
+                    
+                    if (root == null) {
+                        root = new Node<T>(element, Color.BLACK);
+                        added = true;
+                    }
+                    else if (element.compareTo(current.value) == 0) {
+                        return;
+                    }
+                    else if (element.compareTo(current.value) < 0 && current.left == null) {
+                        current.left = new Node<T>(element, Color.RED);
+                        current.left.parent = current;
+                        insertAdjust(current);
+                        added = true;
+                    }
+                    else if (element.compareTo(current.value) > 0 && current.right == null) {
+                        current.right = new Node<T>(element, Color.RED);
+                        current.right.parent = current;
+                        insertAdjust(current);
+                        added = true;
+                    }
+                    else if (element.compareTo(current.value) < 0 && current.left != null) {
+                        current = current.left;
+                    }
+                    else if (element.compareTo(current.value) > 0 && current.right != null)  {
+                        current = current.right;
+                    }
+                }
+                
 		size++;
                 root.color = Color.BLACK;
 	}
 
-	//helper method to add so as not to expose root node
-	private void insert(T element, Node<T> root) {
-
-		if (this.root == null) {
-
-			this.root = new Node<T>(element, Color.BLACK);
-		}
-		else if (element.compareTo(root.value) < 0 && root.left == null) {
-
-			root.left = new Node<T>(element, Color.RED);
-			root.left.parent = root;
-			insertAdjust(root);
-		}
-		else if (element.compareTo(root.value) > 0 && root.right == null) {
-
-			root.right = new Node<T>(element, Color.RED);
-			root.right.parent = root;
-			insertAdjust(root);
-		}
-		else if (element.compareTo(root.value) < 0 && root.left != null) {
-
-			insert(element, root.left);
-		}
-		else if (element.compareTo(root.value) > 0 && root.right != null) {
-
-			insert(element, root.right);
-		}
-		
-		
-	}
 
 	private void insertAdjust(Node<T> node) {
 
@@ -88,7 +90,13 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T> {
 	private void rotateRight(Node<T> node) {
 		
 		Node<T> p = node.parent;
+                Color temp = p.color;
+                p.color = node.color;
+                node.color = temp;
 		node.parent = p.parent;
+                if (node.parent != null) {
+                    node.parent.left = node;
+                }
 		p.parent = node;
                 p.left = node.right;
                 node.right = p;
@@ -99,10 +107,7 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T> {
                 if (node.color == Color.RED) {
                     node.left.color = Color.BLACK;
                     node.right.color = Color.BLACK;
-                }
-                else {
-                    p.color = Color.RED;
-                }       
+                }      
         }
 
 	private void rotateLeft(Node<T> node) {
@@ -126,8 +131,6 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T> {
                     node.left.color = Color.BLACK;
                     node.right.color = Color.BLACK;
                 }
-                
-              
 	}
 
 	public void remove(T element) {
@@ -163,9 +166,9 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T> {
 		if (root.left != null) {
 			print(root.left);
 		}
-		if (root != null) {
-			System.out.print("(" + root.value + "," + root.color + ")");
-		}
+                
+                System.out.print("(" + root.value + "," + root.color + ")");
+                
 		if (root.right != null) {
 			print(root.right);
 		}
