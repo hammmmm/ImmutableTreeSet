@@ -17,6 +17,9 @@ class Node<T extends Comparable<T>> {
 	//will work as long as this != root
 	//may return null
 	Node<T> sibling() {
-		return (value.compareTo(parent.value) > 0) ? parent.right : parent.left;
+		if (this == parent.left){
+                    return parent.right;
+                }
+                return parent.left;
 	}
 }

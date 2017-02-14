@@ -22,30 +22,27 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T> {
 	public void add(T element) {
 		insert(element, root);
 		size++;
+                root.color = Color.BLACK;
 	}
 
 	//helper method to add so as not to expose root node
 	private void insert(T element, Node<T> root) {
 
-		if (root == null) {
+		if (this.root == null) {
 
-			root = new Node<T>(element, Color.BLACK);
-		}
-		else if (element.compareTo(root.value) == 0) {
-
-			return;
+			this.root = new Node<T>(element, Color.BLACK);
 		}
 		else if (element.compareTo(root.value) < 0 && root.left == null) {
 
 			root.left = new Node<T>(element, Color.RED);
 			root.left.parent = root;
-			insertAdjust(root.left);
+			insertAdjust(root);
 		}
 		else if (element.compareTo(root.value) > 0 && root.right == null) {
 
 			root.right = new Node<T>(element, Color.RED);
 			root.right.parent = root;
-			insertAdjust(root.right);
+			insertAdjust(root);
 		}
 		else if (element.compareTo(root.value) < 0 && root.left != null) {
 
@@ -55,50 +52,82 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T> {
 
 			insert(element, root.right);
 		}
+		
+		
 	}
 
 	private void insertAdjust(Node<T> node) {
 
-		if (node != null && node != root && node.parent.color == Color.RED) {
+		if (node != null && node != root && node.color == Color.RED) {
 
 			//recolors and then looks to see if anything else needs to be adjusted
-			if (node.parent.sibling() != null && node.parent.sibling().color == Color.RED) {
+			if (node.sibling() != null && node.sibling().color == Color.RED
+                                 ) {
 
-				node.parent.color = Color.BLACK;
-				node.parent.sibling().color = Color.BLACK;
-				node.parent.parent.color = Color.RED;
+				node.color = Color.BLACK;
+				node.sibling().color = Color.BLACK;
+				node.parent.color = Color.RED;
 				insertAdjust(node.parent.parent);
 			}
 			//left rotate
-			else if (node == node.parent.right && (node.sibling() == null || node.sibling().color == Color.BLACK)) {
+			else if (node.right != null && node.right.color == Color.RED) {
 			
 				rotateLeft(node);
-				insertAdjust(node.right);
+//				insertAdjust(node.parent);
 			}
 			// right rotate
-			else if (node == node.parent.left && (node.sibling() == null || node.sibling().color == Color.BLACK)) {
+			else if (node.left != null && node.left.color == Color.RED) {
 				
 				rotateRight(node);
-				insertAdjust(node.left);
+				insertAdjust(node.parent);
 			}
 		}
-
-		root.color = Color.BLACK;
 	}
 
-
-	private void rotateLeft(Node<T> node) {
-		node.parent = node.parent.parent;
-		node.parent.left.right = node.left;
-		node.left = node.parent.left;
-		node.left.parent = node;
-	}
 
 	private void rotateRight(Node<T> node) {
-		node.parent.right.parent = node.parent.parent;
-		node.parent.parent.left = node.sibling();
-		node.parent.right = node.parent.right.parent;
-		node.right.color = Color.RED;
+		
+		Node<T> p = node.parent;
+		node.parent = p.parent;
+		p.parent = node;
+                p.left = node.right;
+                node.right = p;
+                if (node.parent == null) {
+                    this.root = node;
+                    node.color = Color.BLACK;
+                }
+                if (node.color == Color.RED) {
+                    node.left.color = Color.BLACK;
+                    node.right.color = Color.BLACK;
+                }
+                else {
+                    p.color = Color.RED;
+                }       
+        }
+
+	private void rotateLeft(Node<T> node) {
+
+		Node<T> p = node.parent;
+                Color temp = p.color;
+                p.color = node.color;
+                node.color = temp;
+		node.parent = p.parent;
+                if (node.parent != null) {
+                    node.parent.right = node;
+                }
+		p.parent = node;
+                p.right = node.left;
+                node.left = p;
+                if (node.parent == null) {
+                    this.root = node;
+                    node.color = Color.BLACK;
+                }
+                if (node.color == Color.RED) {
+                    node.left.color = Color.BLACK;
+                    node.right.color = Color.BLACK;
+                }
+                
+              
 	}
 
 	public void remove(T element) {
@@ -131,17 +160,18 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T> {
 
 	private void print(Node<T> root) {
 		
-		if (root == null) {
-			return;
-		}
 		if (root.left != null) {
 			print(root.left);
 		}
 		if (root != null) {
-			System.out.print(root.value + ",");
+			System.out.print("(" + root.value + "," + root.color + ")");
 		}
 		if (root.right != null) {
 			print(root.right);
 		}
+	}
+
+	public void Print() {
+
 	}
 }
