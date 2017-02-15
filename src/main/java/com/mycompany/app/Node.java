@@ -22,4 +22,10 @@ class Node<T extends Comparable<T>> {
                 }
                 return parent.left;
 	}
+        
+        Node<T> uncle() {
+            if(parent != null && parent.parent != null)
+		return parent.sibling();
+            return null;
+	}
 }
