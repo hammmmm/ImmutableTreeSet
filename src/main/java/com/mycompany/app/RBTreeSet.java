@@ -173,11 +173,11 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
 
     @Override
     public Iterator iterator() {
-        return new RBTreeSetIterator(root);
+        return new RBTIterator(root);
     }
 
-    RBTreeSetIterator ITERATOR() {
-        return new RBTreeSetIterator(root);
+    RBTIterator ITERATOR() {
+        return new RBTIterator(root);
     }
 
     public int size() {
