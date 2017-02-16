@@ -4,7 +4,7 @@ import java.lang.Iterable;
 import java.lang.Comparable;
 import java.util.Iterator;
 import java.lang.System;
-import java.util.Stack;
+
 // Every node is colored with either red or black.
 // All leaf (nil) nodes are colored with black; if a node’s child is missing then we will assume that it has a nil child in that place and this nil child is always colored black.
 // Both children of a red node must be black nodes.
@@ -21,7 +21,6 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
     }
 
     public void add(T element) {
-//		insert(element, root);
 
         Node current = root;
         boolean added = false;
@@ -50,9 +49,6 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
         }
         root.color = Color.BLACK;
         size++;
-        print(root);
-        System.out.println();
-        System.out.println();
     }
 
     private void insertAdjust(Node node) {

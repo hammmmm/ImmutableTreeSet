@@ -7,7 +7,6 @@ import java.util.Iterator;
 
 /**
  * Hello world!
- *
  */
 public class App {
 
@@ -40,18 +39,17 @@ public class App {
         tree.add(new Integer(101));
         tree.add(new Integer(17));
         tree.add(new Integer(19));
-//        tree.add(new Integer(1));
-            System.out.print("{");
-            tree.print();
-            System.out.println("}");
 
-            System.out.println(maxDepth(tree.root));
-            
-//            RBTreeSetIterator I = tree.ITERATOR();
-//            while(I.hasNext()) {
-//                Node n = I.NEXT();
-//                System.out.println("C: " + n.color + ", P: " + n.parent.value + ", L: " + n.left.value + ", R: " + n.right.value);
-//            }
+        Iterator I = tree.iterator();
+
+        System.out.print("{");
+        while (I.hasNext()) {
+            System.out.print(I.next() + ", ");
+        }
+        System.out.println("}");
+
+        System.out.println(maxDepth(tree.root));
+
     }
 
     private static int maxDepth(Node<Integer> root) {
