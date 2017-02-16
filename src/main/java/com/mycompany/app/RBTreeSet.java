@@ -47,8 +47,6 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
             } else if (element.compareTo(current.value) > 0 && current.right != null) {
                 current = current.right;
             }
-//            print();
-//            System.out.println();
         }
         root.color = Color.BLACK;
         size++;
@@ -61,77 +59,103 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
 
         if (node != null && node != root && node.color == Color.RED) {
 
+            Node grandparent = node.parent.parent;
+            Node parent = node.parent;
+
             //recolors and then looks to see if anything else needs to be adjusted
-            if (node.uncle() != null && node.uncle().color == Color.RED && node.parent.color == Color.RED) {
+            if (node.uncle() != null && node.uncle().color == Color.RED && parent.color == Color.RED) {
 
                 node.uncle().color = Color.BLACK;
-                node.parent.color = Color.BLACK;
-                if (node.parent.parent != null && node.parent.parent != root) {
-                    node.parent.parent.color = Color.RED;
-                }
-                insertAdjust(node.parent.parent);
+                parent.color = Color.BLACK;
+                grandparent.color = Color.RED;
+                insertAdjust(grandparent);
             } //left rotate
-            else if ((node.uncle() == null || node.uncle().color == Color.BLACK) && node.parent.color == Color.RED && node == node.parent.right) {
+            else if ((node.uncle() == null || node.uncle().color == Color.BLACK) && parent.color == Color.RED) {
 
-                rotateLeft(node);
-                insertAdjust(node.parent);
+                Node next = restructure(node);
+                insertAdjust(next);
             } // right rotate
-            else if ((node.uncle() == null || node.uncle().color == Color.BLACK) && node.parent.color == Color.RED && node == node.parent.left) {
+            else if ((node.uncle() == null || node.uncle().color == Color.BLACK) && parent.color == Color.RED) {
 
-                rotateRight(node);
-                insertAdjust(node.parent);
+                Node next = (node);
+                insertAdjust(next);
             }
         }
     }
 
-    private void rotateRight(Node<T> node) {
+    private Node restructure(Node<T> node) {
 
-        Node<T> p = node.parent;
-        node.parent = p.parent;
+        Node ancestor = node.parent.parent.parent;
+        Node grandparent = node.parent.parent;
+        Node parent = node.parent;
+        Node next;
 
-        if (node.parent != null) {
-            if (node.parent.left == p) {
-                node.parent.left = node;
-            } else if (node.parent.right == p) {
-                node.parent.right = node;
-            }
+        if (node == parent.left && parent == grandparent.left) {
+
+            next = parent;
+            grandparent.left = parent.right;
+            parent.parent = ancestor;
+            parent.right = grandparent;
+            grandparent.parent = parent;
+
+            bindAncestor(grandparent, ancestor, parent);
+        } else if (node == parent.right && parent == grandparent.left) {
+
+            next = node;
+            node.parent = ancestor;
+            grandparent.left = node.right;
+            node.right.parent = grandparent;
+            parent.right = node.left;
+            node.left = parent;
+            node.right = grandparent;
+            parent.parent = node;
+            grandparent.parent = node;
+
+            bindAncestor(grandparent, ancestor, node);
+        } else if (node == parent.left && parent == grandparent.right) {
+
+            next = node;
+            node.parent = ancestor;
+            grandparent.right = node.left;
+            node.left.parent = grandparent;
+            node.left = grandparent;
+            parent.left = node.right;
+            node.right = parent;
+            grandparent.parent = node;
+            parent.parent = node;
+
+            bindAncestor(grandparent, ancestor, node);
+        } else if (node == parent.right && parent == grandparent.right) {
+
+            next = parent;
+            grandparent.right = parent.left;
+            parent.parent = ancestor;
+            parent.left = grandparent;
+            grandparent.parent = parent;
+
+            bindAncestor(grandparent, ancestor, parent);
+        } else {
+            return null;
         }
-        p.parent = node;
-        p.left = node.right;
-        node.right = p;
 
-        Color temp = p.color;
-        p.color = node.color;
-        node.color = temp;
+        next.color = Color.BLACK;
+        next.right.color = Color.RED;
+        next.left.color = Color.RED;
 
-        if (node.parent == null) {
-            this.root = node;
-            node.color = Color.BLACK;
+        if (next.parent == null) {
+            root = next;
         }
+        return next;
     }
 
-    private void rotateLeft(Node<T> node) {
+    private void bindAncestor(Node g, Node a, Node n) {
+        if (a != null) {
+            if (g == a.left) {
+                a.left = n;
 
-        Node<T> p = node.parent;
-        node.parent = p.parent;
-        if (node.parent != null) {
-            if (node.parent.left == p) {
-                node.parent.left = node;
-            } else if (node.parent.right == p) {
-                node.parent.right = node;
+            } else if (g == a.right) {
+                a.right = n;
             }
-        }
-        p.parent = node;
-        p.right = node.left;
-        node.left = p;
-
-        Color temp = p.color;
-        p.color = node.color;
-        node.color = temp;
-
-        if (node.parent == null) {
-            this.root = node;
-            node.color = Color.BLACK;
         }
     }
 
@@ -166,36 +190,6 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
 
     public void print() {
         print(root);
-//        if (root == null) {
-//            return;
-//        }
-//
-//        //keep the nodes in the path that are waiting to be visited
-//        Stack<Node> stack = new Stack<Node>();
-//        Node node = root;
-//
-//        //first node to be visited will be the left one
-//        while (node != null) {
-//            stack.push(node);
-//            node = node.left;
-//        }
-//
-//        // traverse the tree
-//        while (stack.size() > 0) {
-//
-//            // visit the top node
-//            node = stack.pop();
-//            System.out.print("(" + node.value + "," + node.color + ")");
-//            if (node.right != null) {
-//                node = node.right;
-//
-//                // the next node to be visited is the leftmost
-//                while (node != null) {
-//                    stack.push(node);
-//                    node = node.left;
-//                }
-//            }
-//        }
     }
 
     private void print(Node<T> node) {
@@ -208,8 +202,4 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
             print(node.right);
         }
     }
-
-//    private void Print(Node<T> node) {
-//        if (node != null)
-//    }
 }

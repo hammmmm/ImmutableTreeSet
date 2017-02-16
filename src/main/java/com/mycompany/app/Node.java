@@ -24,8 +24,9 @@ class Node<T extends Comparable<T>> {
 	}
         
         Node<T> uncle() {
-            if(parent != null && parent.parent != null)
-		return parent.sibling();
+            if(parent != null && parent.parent != null) {
+				return parent.sibling();
+			}
             return null;
 	}
 }
