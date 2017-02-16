@@ -104,7 +104,9 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
             next = node;
             node.parent = ancestor;
             grandparent.left = node.right;
-            node.right.parent = grandparent;
+            if (node.right != null) {
+                node.right.parent = grandparent;
+            }
             parent.right = node.left;
             node.left = parent;
             node.right = grandparent;
@@ -117,7 +119,9 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
             next = node;
             node.parent = ancestor;
             grandparent.right = node.left;
-            node.left.parent = grandparent;
+            if(node.left != null) {
+                node.left.parent = grandparent;
+            }
             node.left = grandparent;
             parent.left = node.right;
             node.right = parent;
