@@ -10,9 +10,9 @@ import java.util.Stack;
 // Both children of a red node must be black nodes.
 // Every path from a node n to a descendent leaf has the same number of black nodes (not counting node n). We call this number the black height of n, which is denoted by bh(n).
 
-public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
+public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
 
-    Node<T> root;
+    Node root;
     private int size;
 
     public RBTreeSet() {
@@ -23,22 +23,22 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
     public void add(T element) {
 //		insert(element, root);
 
-        Node<T> current = root;
+        Node current = root;
         boolean added = false;
         while (!added) {
 
             if (root == null) {
-                root = new Node<T>(element, Color.BLACK);
+                root = new Node(element, Color.BLACK);
                 added = true;
             } else if (element.compareTo(current.value) == 0) {
                 return;
             } else if (element.compareTo(current.value) < 0 && current.left == null) {
-                current.left = new Node<T>(element, Color.RED);
+                current.left = new Node(element, Color.RED);
                 current.left.parent = current;
                 insertAdjust(current.left);
                 added = true;
             } else if (element.compareTo(current.value) > 0 && current.right == null) {
-                current.right = new Node<T>(element, Color.RED);
+                current.right = new Node(element, Color.RED);
                 current.right.parent = current;
                 insertAdjust(current.right);
                 added = true;
@@ -55,7 +55,7 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
         System.out.println();
     }
 
-    private void insertAdjust(Node<T> node) {
+    private void insertAdjust(Node node) {
 
         if (node != null && node != root && node.color == Color.RED) {
 
@@ -69,16 +69,16 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
                 parent.color = Color.BLACK;
                 grandparent.color = Color.RED;
                 insertAdjust(grandparent);
-            } //left rotate
+            }
             else if ((node.uncle() == null || node.uncle().color == Color.BLACK) && parent.color == Color.RED) {
 
                 Node next = restructure(node);
                 insertAdjust(next);
-            } // right rotate
+            }
         }
     }
 
-    private Node restructure(Node<T> node) {
+    private Node restructure(Node node) {
 
         Node ancestor = node.parent.parent.parent;
         Node grandparent = node.parent.parent;
@@ -162,20 +162,16 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
 
     }
 
-    private void delete(T x, Node<T> root) {
+    private void delete(T x, Node root) {
 
     }
 
-    private void deleteAdjust(Node<T> node) {
+    private void deleteAdjust(Node node) {
 
     }
 
     @Override
     public Iterator iterator() {
-        return new RBTIterator(root);
-    }
-
-    RBTIterator ITERATOR() {
         return new RBTIterator(root);
     }
 
@@ -191,7 +187,7 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
         print(root);
     }
 
-    private void print(Node<T> node) {
+    private void print(Node node) {
 
         if (node != null) {
 

@@ -3,7 +3,7 @@ package com.mycompany.app;
 import java.util.Iterator;
 import java.lang.Comparable;
 
-public interface ISet<T extends Comparable<T>> {
+public interface ISet<T extends Comparable> {
 
 	void add(T element);
 
