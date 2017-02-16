@@ -75,11 +75,6 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
                 Node next = restructure(node);
                 insertAdjust(next);
             } // right rotate
-            else if ((node.uncle() == null || node.uncle().color == Color.BLACK) && parent.color == Color.RED) {
-
-                Node next = (node);
-                insertAdjust(next);
-            }
         }
     }
 
@@ -119,7 +114,7 @@ public class RBTreeSet<T extends Comparable<T>> implements ISet<T>, Iterable {
             next = node;
             node.parent = ancestor;
             grandparent.right = node.left;
-            if(node.left != null) {
+            if (node.left != null) {
                 node.left.parent = grandparent;
             }
             node.left = grandparent;
