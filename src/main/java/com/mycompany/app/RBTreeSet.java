@@ -75,6 +75,63 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
         }
     }
 
+    private Node rightRotation(Node parent, Node grandparent, Node ancestor) {
+
+            Node next = parent;
+            grandparent.left = parent.right;
+            parent.parent = ancestor;
+            parent.right = grandparent;
+            grandparent.parent = parent;
+
+            bindAncestor(grandparent, ancestor, parent);
+            return next;
+    }
+
+    private Node lrightRotation(Node node, Node parent, Node grandparent, Node ancestor) {
+        Node next = node;
+        node.parent = ancestor;
+        grandparent.left = node.right;
+        if (node.right != null) {
+            node.right.parent = grandparent;
+        }
+        parent.right = node.left;
+        node.left = parent;
+        node.right = grandparent;
+        parent.parent = node;
+        grandparent.parent = node;
+
+        bindAncestor(grandparent, ancestor, node);
+        return next;
+    }
+
+    private Node leftRotation(Node parent, Node grandparent, Node ancestor) {
+        Node next = parent;
+        grandparent.right = parent.left;
+        parent.parent = ancestor;
+        parent.left = grandparent;
+        grandparent.parent = parent;
+
+        bindAncestor(grandparent, ancestor, parent);
+        return next;
+    }
+
+    private Node rleftRotation(Node node, Node parent, Node grandparent, Node ancestor) {
+        Node next = node;
+        node.parent = ancestor;
+        grandparent.right = node.left;
+        if (node.left != null) {
+            node.left.parent = grandparent;
+        }
+        node.left = grandparent;
+        parent.left = node.right;
+        node.right = parent;
+        grandparent.parent = node;
+        parent.parent = node;
+
+        bindAncestor(grandparent, ancestor, node);
+        return next;
+    }
+
     private Node restructure(Node node) {
 
         Node ancestor = node.parent.parent.parent;
@@ -84,52 +141,20 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
 
         if (node == parent.left && parent == grandparent.left) {
 
-            next = parent;
-            grandparent.left = parent.right;
-            parent.parent = ancestor;
-            parent.right = grandparent;
-            grandparent.parent = parent;
+            next = rightRotation(parent, grandparent, ancestor);
 
-            bindAncestor(grandparent, ancestor, parent);
         } else if (node == parent.right && parent == grandparent.left) {
 
-            next = node;
-            node.parent = ancestor;
-            grandparent.left = node.right;
-            if (node.right != null) {
-                node.right.parent = grandparent;
-            }
-            parent.right = node.left;
-            node.left = parent;
-            node.right = grandparent;
-            parent.parent = node;
-            grandparent.parent = node;
+            next = lrightRotation(node, parent, grandparent, ancestor);
 
-            bindAncestor(grandparent, ancestor, node);
         } else if (node == parent.left && parent == grandparent.right) {
 
-            next = node;
-            node.parent = ancestor;
-            grandparent.right = node.left;
-            if (node.left != null) {
-                node.left.parent = grandparent;
-            }
-            node.left = grandparent;
-            parent.left = node.right;
-            node.right = parent;
-            grandparent.parent = node;
-            parent.parent = node;
+            next = rleftRotation(node, parent, grandparent, ancestor);
 
-            bindAncestor(grandparent, ancestor, node);
         } else if (node == parent.right && parent == grandparent.right) {
 
-            next = parent;
-            grandparent.right = parent.left;
-            parent.parent = ancestor;
-            parent.left = grandparent;
-            grandparent.parent = parent;
+            next = leftRotation(parent, grandparent, ancestor);
 
-            bindAncestor(grandparent, ancestor, parent);
         } else {
             return null;
         }
@@ -186,23 +211,130 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
         }
     }
 
+    private Node replaceNode(Node n, Node replacement) {
+        if (n == n.parent.left) {
+            n.parent.left = replacement;
+        }
+        else if (n == n.parent.right) {
+            n.parent.right = replacement;
+        }
+        if (replacement != null) {
+            replacement.parent = n.parent;
+        }
+        return replacement;
+    }
+
     private void delete(Node n) {
 
         if (n.color == Color.RED && n.left == null && n.right == null) {
-            if (n == n.parent.right) {
-                n.parent.right = null;
-            }
-            else if (n == n.parent.left) {
-                n.parent.left = null;
-            }
+            replaceNode(n, null);
         }
         else if (n.color == Color.BLACK && n.right != null && n.right.color == Color.RED) {
-            if (n == n.parent.right) {
-                n.parent.right = n.right;
-            }
-            else if (n == n.parent.left) {
-                n.parent.left = n.right;
-            }
+            Node r = replaceNode(n, n.right);
+            n.right.color = Color.BLACK;
+        }
+        else if (n.color == Color.BLACK && (n.right == null || n.right.color == Color.BLACK)
+                && (n.left == null || n.left.color == Color.BLACK)) {
+
+            Node r = replaceNode(n, new Node(Color.DOUBLEBLACK));
+            r.left = n.left;
+            r.right = n.right;
+            dbOne(r);
+        }
+    }
+
+    /** terminal
+     * node is root && doubleblack
+     * @param n
+     */
+    private void dbOne(Node n) {
+
+        if (n == root) {
+
+        }
+        else {
+            dbTwo(n);
+        }
+    }
+
+    /**
+     * node is doubleblack
+     * sibling is red
+     * parent is black
+     * @param n
+     */
+    private void dbTwo(Node n) {
+
+        if (n.sibling() != null && n.sibling().color == Color.RED && n.parent.color == Color.BLACK){
+
+        }
+        dbThree(n);
+    }
+
+    /**
+     * node is doubleblack
+     * sibling is black with black children
+     * parent is black
+     * @param n
+     */
+    private void dbThree(Node n) {
+
+        if (n.sibling() != null && n.sibling().color == Color.BLACK && n.parent.color == Color.BLACK
+                && (n.sibling().right == null || n.sibling().right.color == Color.BLACK)
+                && (n.sibling().left == null || n.sibling().left.color == Color.BLACK)) {
+
+        }
+        dbFour(n);
+    }
+
+
+    /** terminal
+     * node is double black
+     * parent is red
+     * sibling is black with black children
+     */
+    private void dbFour(Node n) {
+
+        if (n.sibling() != null && n.sibling().color == Color.BLACK && n.parent.color == Color.RED
+                && (n.sibling().right == null || n.sibling().right.color == Color.BLACK)
+                && (n.sibling().left == null || n.sibling().left.color == Color.BLACK)) {
+
+            n.sibling().color = Color.RED;
+            n.parent.color = Color.BLACK;
+            n.parent.left = n.right;
+            n.right.parent = n.parent;
+        }
+        else {
+            dbFive(n);
+        }
+    }
+
+    /**
+     * node is doublblack
+     * parent is black
+     * sibling is black with one red left child
+     * @param n
+     */
+    private void dbFive(Node n) {
+
+        if (n.sibling() != null && n.sibling().color == Color.BLACK && n.parent.color == Color.BLACK
+                && n.sibling().left != null && n.left.color == Color.RED) {
+
+        }
+        dbSix(n);
+    }
+
+    /** terminal
+     * node is doubleblack
+     * parent is ambiguous
+     * sibling is black with at least one red child
+     * @param n
+     */
+    private void dbSix(Node n) {
+
+        if (n.sibling() != null && n.sibling().color == Color.BLACK
+                && n.sibling().right != null && n.right.color == Color.RED) {
+
         }
     }
 
