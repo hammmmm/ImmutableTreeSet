@@ -80,6 +80,4 @@ public class ImmutableSet<T extends Comparable> implements ISet<T>, Iterable {
     public boolean contains(T element) {
         return current.contains(element);
     }
-
-
 }

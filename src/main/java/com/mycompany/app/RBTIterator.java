@@ -4,15 +4,16 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.lang.Comparable;
 
-class RBTIterator<T extends Comparable> implements Iterator {
+public class RBTIterator<T extends Comparable> implements Iterator {
 
-    Stack<Node> inOrder;
+    private Stack<Node> inOrder;
 
     RBTIterator(Node root) {
         inOrder = new Stack();
         fillStack(root);
     }
 
+    //fills up the stack using an backwards in-order traversal because FILO property of stacks
     private void fillStack(Node node) {
         if (node != null) {
 
@@ -25,7 +26,6 @@ class RBTIterator<T extends Comparable> implements Iterator {
             }
         }
     }
-
 
     @Override
     public boolean hasNext() {

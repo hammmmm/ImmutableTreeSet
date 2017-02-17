@@ -6,64 +6,34 @@ import java.lang.System.*;
 import java.util.Iterator;
 
 /**
- * Hello world!
+ * Maven created this and stores some references to it. Don't want to delete it and accidentally screw up the project structure.
+ * Right now it just prints out a set before and after a some operations
  */
 public class App {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+
+        ImmutableSet<Integer> set = new ImmutableSet();
         Random r = new Random();
-//        for (int j = 1; j < 11; j++) {
-//        RBTreeSet<Integer> tree = new RBTreeSet<Integer>();
-//
-//        for (int i = j; i > -1; i--) {
-//            int x = r.nextInt(50);
-//            tree.add(new Integer(i));
-//        }
-//        System.out.print("{");
-//        tree.print();
-//        System.out.println("}");
-//
-//        System.out.println(maxDepth(tree.root));
-//        }
+        for (int i = 0; i < 10; i++) {
+            set.add(r.nextInt(50));
+            print(set);
+        }
+        for (int i = 0; i < 50; i++) {
+            if (set.contains(i)) {
+                set.remove(i);
+                print(set);
+            }
+        }
+    }
 
-        RBTreeSet<Integer> tree = new RBTreeSet<Integer>();
-        tree.add(new Integer(6));
-        tree.add(new Integer(5));
-        tree.add(new Integer(22));
-        tree.add(new Integer(5));
-        tree.add(new Integer(0));
-        tree.add(new Integer(44));
-        tree.add(new Integer(75));
-        tree.add(new Integer(33));
-        tree.add(new Integer(101));
-        tree.add(new Integer(17));
-        tree.add(new Integer(19));
-
-        Iterator I = tree.iterator();
-
+    static void print(ImmutableSet s) {
+        Iterator iterator = s.iterator();
         System.out.print("{");
-        while (I.hasNext()) {
-            System.out.print(I.next() + ", ");
+        while(iterator.hasNext()) {
+            System.out.print(iterator.next() + ",");
         }
         System.out.println("}");
-
-        System.out.println(maxDepth(tree.root));
-
     }
 
-    private static int maxDepth(Node<Integer> root) {
-        if (root == null) {
-            return 0;
-        }
-
-        int ldepth = maxDepth(root.left);
-        int rdepth = maxDepth(root.right);
-
-        if (ldepth > rdepth) {
-            return ldepth + 1;
-        } else {
-            return rdepth + 1;
-        }
-    }
 }

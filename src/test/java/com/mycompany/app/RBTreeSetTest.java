@@ -32,7 +32,7 @@ public class RBTreeSetTest extends TestCase {
 		RBTreeSet<Integer> tree = new RBTreeSet<Integer>();
 		assertTrue(tree.isEmpty());
         
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 100; i++) {
             tree.add(i);
             assertEquals(tree.size(), i);
         }
@@ -54,7 +54,7 @@ public class RBTreeSetTest extends TestCase {
         assertTrue(inOrder(tree.root));
     }
 
-    private boolean inOrder(Node<Integer> root){
+    private boolean inOrder(Node root){
         if (root == null) {
             return true;
         }
@@ -71,8 +71,8 @@ public class RBTreeSetTest extends TestCase {
 
     /**
      * A full and complete binary tree with n nodes and maximum depth k (the depth of the leaf nodes) has the following relationship:
-        n=2k+1−1
-     * this confirms that n <= 2^k+1 where n is node_count and k is maximum depth
+        n=2^(k+1)−1
+     * this confirms that n <= 2^(k+1) -1 where n is node_count and k is maximum depth
      */
     public void testDepth() {
 
@@ -88,7 +88,7 @@ public class RBTreeSetTest extends TestCase {
          }
      }
 
-    private int maxDepth(Node<Integer> root) {
+    private int maxDepth(Node root) {
         if (root == null) {
             return 0;
         }
