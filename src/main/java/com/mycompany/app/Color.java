@@ -1,6 +1,7 @@
 package com.mycompany.app;
 
-public enum Color {
+enum Color {
 	RED,
-	BLACK;
+	BLACK,
+	DOUBLEBLACK;
 }

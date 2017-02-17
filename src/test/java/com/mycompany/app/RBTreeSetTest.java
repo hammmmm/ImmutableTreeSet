@@ -42,6 +42,7 @@ public class RBTreeSetTest extends TestCase {
 
         for (int i = 1; i <= 100; i++) {
             int x = r.nextInt(50);
+            x = r.nextInt(50) >= 25 ? x * -1 : x;
             tree.add(new Integer(x));
         }
         assertTrue(inOrder(tree.root));

@@ -1,9 +1,11 @@
 package com.mycompany.app;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
 import java.lang.Iterable;
 import java.lang.Comparable;
 import java.util.Iterator;
-import java.lang.System;
+import java.util.NoSuchElementException;
 
 // Every node is colored with either red or black.
 // All leaf (nil) nodes are colored with black; if a node’s child is missing then we will assume that it has a nil child in that place and this nil child is always colored black.
@@ -65,8 +67,7 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
                 parent.color = Color.BLACK;
                 grandparent.color = Color.RED;
                 insertAdjust(grandparent);
-            }
-            else if ((node.uncle() == null || node.uncle().color == Color.BLACK) && parent.color == Color.RED) {
+            } else if ((node.uncle() == null || node.uncle().color == Color.BLACK) && parent.color == Color.RED) {
 
                 Node next = restructure(node);
                 insertAdjust(next);
@@ -156,10 +157,83 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
 
     public void remove(T element) {
 
+        Node current = root;
+        while (current != null && element != current.value) {
+
+            if (element.compareTo(current.value) < 0) {
+                current = current.left;
+            } else if (element.compareTo(current.value) > 0) {
+                current = current.right;
+            }
+        }
+
+        if (current == null) {
+            throw new NoSuchElementException();
+        }
+
+        if (current.left != null && current.right != null) {
+
+            if (current.color == Color.RED) {
+
+                current = swapSuccessor(current);
+                delete(current);
+
+            } else if (current.color == Color.BLACK) {
+
+                current = swapSuccessor(current);
+                delete(current);
+            }
+        }
     }
 
-    private void delete(T x, Node root) {
+    private void delete(Node n) {
 
+        if (n.color == Color.RED && n.left == null && n.right == null) {
+            if (n == n.parent.right) {
+                n.parent.right = null;
+            }
+            else if (n == n.parent.left) {
+                n.parent.left = null;
+            }
+        }
+        else if (n.color == Color.BLACK && n.right != null && n.right.color == Color.RED) {
+            if (n == n.parent.right) {
+                n.parent.right = n.right;
+            }
+            else if (n == n.parent.left) {
+                n.parent.left = n.right;
+            }
+        }
+    }
+
+    //do successors need to match the color of their counterparts???
+    private Node swapSuccessor(Node n) {
+        Node s = n.successor();
+        Node temp = s.parent;
+        s.parent = n.parent;
+
+        if (n == n.parent.left) {
+            n.parent.left = s;
+        }
+        else if (n == n.parent.right) {
+            n.parent.right = s;
+        }
+
+        if (s == temp.left) {
+            temp.left = n;
+        }
+        else if (s == temp.right) {
+            temp.right = n;
+        }
+
+        temp = s.right;
+        s.right = n.right;
+        s.right.parent = s;
+        s.left = n.left;
+        s.left.parent = s;
+        n.left = null;
+        n.right = temp;
+        return n;
     }
 
     private void deleteAdjust(Node node) {
@@ -177,20 +251,5 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
 
     public boolean isEmpty() {
         return size == 0;
-    }
-
-    public void print() {
-        print(root);
-    }
-
-    private void print(Node node) {
-
-        if (node != null) {
-
-            print(node.left);
-            System.out.print("(" + node.value + "," + node.color + ")");
-
-            print(node.right);
-        }
     }
 }
