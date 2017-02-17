@@ -20,8 +20,7 @@ class Node<T extends Comparable> {
         left = right = parent = null;
     }
 
-    //will work as long as this != root
-    //may return null
+    //will return sibling or null as long as this != root
     Node sibling() {
         if (this == parent.left) {
             return parent.right;
@@ -29,6 +28,7 @@ class Node<T extends Comparable> {
         return parent.left;
     }
 
+    //will return uncle or null as long as this.parent != root
     Node uncle() {
         if (parent != null && parent.parent != null) {
             return parent.sibling();

@@ -9,9 +9,11 @@ public interface ISet<T extends Comparable> {
 
 	void remove(T element);
 
-	// Iterator iterator();
+	Iterator iterator();
 
 	int size();
 
 	boolean isEmpty();
+
+	boolean contains(T element);
 }

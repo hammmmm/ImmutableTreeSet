@@ -24,26 +24,32 @@ public class RBTreeSetTest extends TestCase {
         return new TestSuite( RBTreeSetTest.class );
     }
 
+    /**
+     * confirms that the tree properly tracks it's own size
+     */
 	public void testSize() {
 
 		RBTreeSet<Integer> tree = new RBTreeSet<Integer>();
 		assertTrue(tree.isEmpty());
         
         for (int i = 1; i <= 10; i++) {
-            tree.add(new Integer(i));
+            tree.add(i);
             assertEquals(tree.size(), i);
         }
 	}
 
+    /**
+     * Confirms that the tree keeps elements in order
+     */
     public void testAdd() {
 
         Random r = new Random();
-        RBTreeSet<Integer> tree = new RBTreeSet<Integer>();
+        RBTreeSet<Integer> tree = new RBTreeSet();
 
         for (int i = 1; i <= 100; i++) {
             int x = r.nextInt(50);
             x = r.nextInt(50) >= 25 ? x * -1 : x;
-            tree.add(new Integer(x));
+            tree.add(x);
         }
         assertTrue(inOrder(tree.root));
     }
@@ -63,16 +69,20 @@ public class RBTreeSetTest extends TestCase {
         }
     }
 
-//     confirms that n <= 2^k+1 where n <- node_count and k <- maximum depth
-     public void testDepth() {
+    /**
+     * A full and complete binary tree with n nodes and maximum depth k (the depth of the leaf nodes) has the following relationship:
+        n=2k+1−1
+     * this confirms that n <= 2^k+1 where n is node_count and k is maximum depth
+     */
+    public void testDepth() {
 
          for(int j = 0; j < 100; j++) {
              Random r = new Random();
              RBTreeSet<Integer> tree = new RBTreeSet<Integer>();
 
-             for (int i = 0; i < j; i++) {
+             for (int i = -j; i <= j; i++) {
                  int x = r.nextInt(50);
-                 tree.add(new Integer(x));
+                 tree.add(x);
              }
              assertTrue(tree.size() <= Math.pow(2, maxDepth(tree.root)+1) - 1);
          }
@@ -93,8 +103,17 @@ public class RBTreeSetTest extends TestCase {
         }
     }
 
-//    public void isRedBLack(Node<Integer> root) {
-//
-//
-//    }
+    /**
+     * verifies that the contains method returns true when appropriate
+     */
+    public void testContains() {
+        RBTreeSet<Integer> tree = new RBTreeSet();
+        for (int i = 0; i < 50; i++) {
+            tree.add(i);
+            assertTrue(tree.contains(i));
+        }
+        for (int i = 51; i < 100; i++) {
+            assertTrue(!tree.contains(i));
+        }
+    }
 }

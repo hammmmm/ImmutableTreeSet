@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.lang.Comparable;
 
-public class RBTIterator<T extends Comparable> implements Iterator {
+class RBTIterator<T extends Comparable> implements Iterator {
 
     Stack<Node> inOrder;
 
@@ -26,13 +26,14 @@ public class RBTIterator<T extends Comparable> implements Iterator {
         }
     }
 
+
     @Override
     public boolean hasNext() {
         return !inOrder.empty();
     }
 
     @Override
-    public Comparable<T> next() {
+    public Comparable next() {
         return inOrder.pop().value;
     }
 }

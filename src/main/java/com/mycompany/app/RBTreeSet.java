@@ -1,8 +1,5 @@
 package com.mycompany.app;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
-import java.lang.Iterable;
 import java.lang.Comparable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -10,19 +7,19 @@ import java.util.NoSuchElementException;
 // Every node is colored with either red or black.
 // All leaf (nil) nodes are colored with black; if a node’s child is missing then we will assume that it has a nil child in that place and this nil child is always colored black.
 // Both children of a red node must be black nodes.
-// Every path from a node n to a descendent leaf has the same number of black nodes (not counting node n). We call this number the black height of n, which is denoted by bh(n).
+// Every path from a node n to a descendent leaf has the same number of black nodes (not counting node n).
 
-public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
+class RBTreeSet<T extends Comparable> {
 
     Node root;
     private int size;
 
-    public RBTreeSet() {
+    RBTreeSet() {
         root = null;
         size = 0;
     }
 
-    public void add(T element) {
+    void add(T element) {
 
         Node current = root;
         boolean added = false;
@@ -53,6 +50,8 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
         size++;
     }
 
+    //Recursive algorithm. Determines whether the tree is a valid RBTree.
+    //If not determines whether a recoloring or a restructuring is appropriate
     private void insertAdjust(Node node) {
 
         if (node != null && node != root && node.color == Color.RED) {
@@ -67,6 +66,7 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
                 parent.color = Color.BLACK;
                 grandparent.color = Color.RED;
                 insertAdjust(grandparent);
+
             } else if ((node.uncle() == null || node.uncle().color == Color.BLACK) && parent.color == Color.RED) {
 
                 Node next = restructure(node);
@@ -75,63 +75,8 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
         }
     }
 
-    private Node rightRotation(Node parent, Node grandparent, Node ancestor) {
-
-            Node next = parent;
-            grandparent.left = parent.right;
-            parent.parent = ancestor;
-            parent.right = grandparent;
-            grandparent.parent = parent;
-
-            bindAncestor(grandparent, ancestor, parent);
-            return next;
-    }
-
-    private Node lrightRotation(Node node, Node parent, Node grandparent, Node ancestor) {
-        Node next = node;
-        node.parent = ancestor;
-        grandparent.left = node.right;
-        if (node.right != null) {
-            node.right.parent = grandparent;
-        }
-        parent.right = node.left;
-        node.left = parent;
-        node.right = grandparent;
-        parent.parent = node;
-        grandparent.parent = node;
-
-        bindAncestor(grandparent, ancestor, node);
-        return next;
-    }
-
-    private Node leftRotation(Node parent, Node grandparent, Node ancestor) {
-        Node next = parent;
-        grandparent.right = parent.left;
-        parent.parent = ancestor;
-        parent.left = grandparent;
-        grandparent.parent = parent;
-
-        bindAncestor(grandparent, ancestor, parent);
-        return next;
-    }
-
-    private Node rleftRotation(Node node, Node parent, Node grandparent, Node ancestor) {
-        Node next = node;
-        node.parent = ancestor;
-        grandparent.right = node.left;
-        if (node.left != null) {
-            node.left.parent = grandparent;
-        }
-        node.left = grandparent;
-        parent.left = node.right;
-        node.right = parent;
-        grandparent.parent = node;
-        parent.parent = node;
-
-        bindAncestor(grandparent, ancestor, node);
-        return next;
-    }
-
+    //Given that the tree needs restructuring this method determines what type of restructuring is appropriate
+    //and calls the associated method.
     private Node restructure(Node node) {
 
         Node ancestor = node.parent.parent.parent;
@@ -167,6 +112,62 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
             root = next;
         }
         return next;
+    }
+
+    private Node rightRotation(Node parent, Node grandparent, Node ancestor) {
+
+        grandparent.left = parent.right;
+        parent.parent = ancestor;
+        parent.right = grandparent;
+        grandparent.parent = parent;
+
+        bindAncestor(grandparent, ancestor, parent);
+        return parent;
+    }
+
+    private Node lrightRotation(Node node, Node parent, Node grandparent, Node ancestor) {
+
+        node.parent = ancestor;
+        grandparent.left = node.right;
+        if (node.right != null) {
+            node.right.parent = grandparent;
+        }
+        parent.right = node.left;
+        node.left = parent;
+        node.right = grandparent;
+        parent.parent = node;
+        grandparent.parent = node;
+
+        bindAncestor(grandparent, ancestor, node);
+        return node;
+    }
+
+    private Node leftRotation(Node parent, Node grandparent, Node ancestor) {
+
+        grandparent.right = parent.left;
+        parent.parent = ancestor;
+        parent.left = grandparent;
+        grandparent.parent = parent;
+
+        bindAncestor(grandparent, ancestor, parent);
+        return parent;
+    }
+
+    private Node rleftRotation(Node node, Node parent, Node grandparent, Node ancestor) {
+
+        node.parent = ancestor;
+        grandparent.right = node.left;
+        if (node.left != null) {
+            node.left.parent = grandparent;
+        }
+        node.left = grandparent;
+        parent.left = node.right;
+        node.right = parent;
+        grandparent.parent = node;
+        parent.parent = node;
+
+        bindAncestor(grandparent, ancestor, node);
+        return node;
     }
 
     private void bindAncestor(Node g, Node a, Node n) {
@@ -214,8 +215,7 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
     private Node replaceNode(Node n, Node replacement) {
         if (n == n.parent.left) {
             n.parent.left = replacement;
-        }
-        else if (n == n.parent.right) {
+        } else if (n == n.parent.right) {
             n.parent.right = replacement;
         }
         if (replacement != null) {
@@ -228,12 +228,10 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
 
         if (n.color == Color.RED && n.left == null && n.right == null) {
             replaceNode(n, null);
-        }
-        else if (n.color == Color.BLACK && n.right != null && n.right.color == Color.RED) {
+        } else if (n.color == Color.BLACK && n.right != null && n.right.color == Color.RED) {
             Node r = replaceNode(n, n.right);
             n.right.color = Color.BLACK;
-        }
-        else if (n.color == Color.BLACK && (n.right == null || n.right.color == Color.BLACK)
+        } else if (n.color == Color.BLACK && (n.right == null || n.right.color == Color.BLACK)
                 && (n.left == null || n.left.color == Color.BLACK)) {
 
             Node r = replaceNode(n, new Node(Color.DOUBLEBLACK));
@@ -243,16 +241,17 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
         }
     }
 
-    /** terminal
+    /**
+     * terminal
      * node is root && doubleblack
+     *
      * @param n
      */
     private void dbOne(Node n) {
 
         if (n == root) {
 
-        }
-        else {
+        } else {
             dbTwo(n);
         }
     }
@@ -261,11 +260,12 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
      * node is doubleblack
      * sibling is red
      * parent is black
+     *
      * @param n
      */
     private void dbTwo(Node n) {
 
-        if (n.sibling() != null && n.sibling().color == Color.RED && n.parent.color == Color.BLACK){
+        if (n.sibling() != null && n.sibling().color == Color.RED && n.parent.color == Color.BLACK) {
 
         }
         dbThree(n);
@@ -275,6 +275,7 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
      * node is doubleblack
      * sibling is black with black children
      * parent is black
+     *
      * @param n
      */
     private void dbThree(Node n) {
@@ -288,7 +289,8 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
     }
 
 
-    /** terminal
+    /**
+     * terminal
      * node is double black
      * parent is red
      * sibling is black with black children
@@ -303,8 +305,7 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
             n.parent.color = Color.BLACK;
             n.parent.left = n.right;
             n.right.parent = n.parent;
-        }
-        else {
+        } else {
             dbFive(n);
         }
     }
@@ -313,28 +314,43 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
      * node is doublblack
      * parent is black
      * sibling is black with one red left child
+     * && one black right child
+     *
      * @param n
      */
     private void dbFive(Node n) {
 
         if (n.sibling() != null && n.sibling().color == Color.BLACK && n.parent.color == Color.BLACK
-                && n.sibling().left != null && n.left.color == Color.RED) {
+                && n.sibling().left != null && n.sibling().left.color == Color.RED
+                && n.sibling().right != null && n.sibling().right.color == Color.BLACK) {
 
         }
+
         dbSix(n);
     }
 
-    /** terminal
+    /**
+     * terminal
      * node is doubleblack
      * parent is ambiguous
-     * sibling is black with at least one red child
+     * sibling is black with one red right child
+     * other child of sibling is ambiguous
+     *
      * @param n
      */
     private void dbSix(Node n) {
 
         if (n.sibling() != null && n.sibling().color == Color.BLACK
-                && n.sibling().right != null && n.right.color == Color.RED) {
+                && n.sibling().right != null && n.right.color == Color.RED && n.sibling().left != null) {
 
+            n = leftRotation(n.sibling(), n.sibling().parent, n.sibling().parent.parent);
+            n.color = n.left.color;
+            n.left.color = Color.BLACK;
+            n.left.left = null;
+        } else if (n.sibling() != null && n.sibling().color == Color.BLACK
+                && n.sibling().left != null && n.left.color == Color.RED && n.sibling().right != null) {
+
+            n = rightRotation(n.parent, n.parent.parent, n.parent.parent.parent);
         }
     }
 
@@ -346,15 +362,13 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
 
         if (n == n.parent.left) {
             n.parent.left = s;
-        }
-        else if (n == n.parent.right) {
+        } else if (n == n.parent.right) {
             n.parent.right = s;
         }
 
         if (s == temp.left) {
             temp.left = n;
-        }
-        else if (s == temp.right) {
+        } else if (s == temp.right) {
             temp.right = n;
         }
 
@@ -368,20 +382,28 @@ public class RBTreeSet<T extends Comparable> implements ISet<T>, Iterable {
         return n;
     }
 
-    private void deleteAdjust(Node node) {
-
-    }
-
-    @Override
-    public Iterator iterator() {
+    Iterator iterator() {
         return new RBTIterator(root);
     }
 
-    public int size() {
+    int size() {
         return size;
     }
 
-    public boolean isEmpty() {
+    boolean isEmpty() {
         return size == 0;
+    }
+
+    boolean contains(T element) {
+        Node n = root;
+        while (n != null && n.value.compareTo(element) != 0) {
+
+            if (element.compareTo(n.value) > 0) {
+                n = n.right;
+            } else if (element.compareTo(n.value) < 0) {
+                n = n.left;
+            }
+        }
+        return n != null;
     }
 }
