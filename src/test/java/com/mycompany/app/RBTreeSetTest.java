@@ -54,6 +54,26 @@ public class RBTreeSetTest extends TestCase {
         assertTrue(inOrder(tree.root));
     }
 
+    public void testRemove() {
+        Random r = new Random();
+        RBTreeSet<Integer> tree = new RBTreeSet();
+
+        for (int i = 1; i <= 100; i++) {
+            int x = r.nextInt(50);
+            x = r.nextInt(50) >= 25 ? x * -1 : x;
+            tree.add(x);
+        }
+
+        while (!tree.isEmpty()) {
+            int x = r.nextInt(50);
+            x = r.nextInt(50) >= 25 ? x * -1 : x;
+            if (tree.contains(x)) {
+                tree.remove(x);
+            }
+            assertTrue(inOrder(tree.root));
+        }
+    }
+
     private boolean inOrder(Node<Integer> root){
         if (root == null) {
             return true;

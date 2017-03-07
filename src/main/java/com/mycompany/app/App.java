@@ -46,12 +46,12 @@ public class App {
 
         System.out.println(maxDepth(tree.root));
 
-        tree.remove(6);
+        tree.remove(22);
         print(tree);
 
         System.out.println(maxDepth(tree.root));
 
-        tree.remove(101);
+        tree.remove(6);
         print(tree);
 
         System.out.println(maxDepth(tree.root));

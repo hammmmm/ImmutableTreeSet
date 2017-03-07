@@ -127,6 +127,7 @@ class RBTreeSet<T extends Comparable> {
     private Node rightRotation(Node parent, Node grandparent, Node ancestor) {
 
         grandparent.left = parent.right;
+//        parent.right.parent = grandparent;
         parent.parent = ancestor;
         parent.right = grandparent;
         grandparent.parent = parent;
@@ -242,8 +243,21 @@ class RBTreeSet<T extends Comparable> {
             n.parent.right = replacement;
         }
         if (replacement != null) {
+            if (replacement == replacement.parent.right) {
+                replacement.parent.right = null;
+            }else if (replacement == replacement.parent.left) {
+                replacement.parent.left = null;
+            }
             replacement.parent = n.parent;
-            replacement.color = n.color;
+            replacement.right = n.right;
+            replacement.left = n.left;
+            if (replacement.left != null) {
+                replacement.left.parent = replacement;
+            }
+            if (replacement.right != null) {
+                replacement.right.parent = replacement;
+            }
+//            replacement.color = n.color;
         }
     }
 
@@ -268,18 +282,24 @@ class RBTreeSet<T extends Comparable> {
                 x = null;
             }
 
-            if (y != null && y.parent == n) {
+            if (y != null && y.parent == n && x != null) {
                 x.parent = y;
             } else if (y != null) {
-                replaceNode(y, y.right);
-                y.right = n.right;
-                y.right.parent = y;
+//                replaceNode(y, y.right);
+//                y.right = n.right;
+//                y.right.parent = y;
+//                y.parent = n.parent;
             }
             replaceNode(n, y);
-            y.left = n.left;
-            y.left.parent = y;
+//            y.left = n.left;
+//            y.left.parent = y;
+//            y.right = n.right;
+//            y.right.parent = y;
+            if (x != null) {
+                x.color = y.color;
+            }
             y.color = n.color;
-//        }
+        }
 //        if (originalColor == Color.BLACK) {
 //            deleteAdjust(x);
 //        }
