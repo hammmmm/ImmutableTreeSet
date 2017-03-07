@@ -1,11 +1,13 @@
 package com.mycompany.app;
 
 import java.lang.Comparable;
+import java.util.ArrayList;
 
 class Node<T extends Comparable> {
 
     final T value;
     Color color;
+    ArrayList<Node> leftLog, rightLog, parentLog;
     Node left, right, parent;
 
     Node(T value, Color color) {
@@ -18,6 +20,14 @@ class Node<T extends Comparable> {
         this.color = color;
         value = null;
         left = right = parent = null;
+    }
+
+    Node copy() {
+        Node n = new Node(this.value, this.color);
+        n.left = this.left;
+        n.right = this.right;
+        n.parent = this.parent;
+        return n;
     }
 
     //will return sibling or null as long as this != root
@@ -36,9 +46,10 @@ class Node<T extends Comparable> {
         return null;
     }
 
+    //returns the leftmost node in the right sub-tree of this node
     Node successor() {
         Node current = right;
-        while (current != null) {
+        while (current != null && current.left != null) {
             current = current.left;
         }
         return current;

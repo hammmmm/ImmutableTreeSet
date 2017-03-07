@@ -1,6 +1,7 @@
 package com.mycompany.app;
 
 import java.lang.Comparable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -11,16 +12,20 @@ import java.util.NoSuchElementException;
 
 class RBTreeSet<T extends Comparable> {
 
+    ArrayList<Node> pastRoots;
     Node root;
     private int size;
 
     RBTreeSet() {
+        pastRoots = new ArrayList();
         root = null;
         size = 0;
     }
 
     void add(T element) {
 
+//        pastRoots.add(0, root);
+//        root = root.copy();
         Node current = root;
         boolean added = false;
         while (!added) {
@@ -29,6 +34,9 @@ class RBTreeSet<T extends Comparable> {
                 root = new Node(element, Color.BLACK);
                 added = true;
             } else if (element.compareTo(current.value) == 0) {
+                //remove newest root path and return set to it's previous state
+//                root = pastRoots.get(0);
+//                pastRoots.remove(0);
                 return;
             } else if (element.compareTo(current.value) < 0 && current.left == null) {
                 current.left = new Node(element, Color.RED);
@@ -41,8 +49,10 @@ class RBTreeSet<T extends Comparable> {
                 insertAdjust(current.right);
                 added = true;
             } else if (element.compareTo(current.value) < 0 && current.left != null) {
+//                current = current.copy();
                 current = current.left;
             } else if (element.compareTo(current.value) > 0 && current.right != null) {
+//                current = current.copy();
                 current = current.right;
             }
         }
@@ -184,7 +194,7 @@ class RBTreeSet<T extends Comparable> {
     public void remove(T element) {
 
         Node current = root;
-        while (current != null && element != current.value) {
+        while (current != null && !element.equals(current.value)) {
 
             if (element.compareTo(current.value) < 0) {
                 current = current.left;
@@ -197,162 +207,145 @@ class RBTreeSet<T extends Comparable> {
             throw new NoSuchElementException();
         }
 
-        if (current.left != null && current.right != null) {
+        delete(current);
 
-            if (current.color == Color.RED) {
-
-                current = swapSuccessor(current);
-                delete(current);
-
-            } else if (current.color == Color.BLACK) {
-
-                current = swapSuccessor(current);
-                delete(current);
-            }
-        }
+//        if (current.left != null && current.right != null) {
+//
+//            if (current.color == Color.RED) {
+//
+//                current = swapSuccessor(current);
+//                delete(current);
+//
+//            } else if (current.color == Color.BLACK) {
+//
+//                current = swapSuccessor(current);
+//                delete(current);
+//            }
+//        }
     }
 
-    private Node replaceNode(Node n, Node replacement) {
-        if (n == n.parent.left) {
+    private void replaceNode(Node n, Node replacement) {
+//        if (n == n.parent.left) {
+//            n.parent.left = replacement;
+//        } else if (n == n.parent.right) {
+//            n.parent.right = replacement;
+//        }
+//        if (replacement != null) {
+//            replacement.parent = n.parent;
+//        }
+//        return replacement;
+        if (n.parent == null) {
+            root = replacement;
+        } else if (n == n.parent.left) {
             n.parent.left = replacement;
         } else if (n == n.parent.right) {
             n.parent.right = replacement;
         }
         if (replacement != null) {
             replacement.parent = n.parent;
+            replacement.color = n.color;
         }
-        return replacement;
     }
 
     private void delete(Node n) {
 
-        if (n.color == Color.RED && n.left == null && n.right == null) {
-            replaceNode(n, null);
-        } else if (n.color == Color.BLACK && n.right != null && n.right.color == Color.RED) {
-            Node r = replaceNode(n, n.right);
-            n.right.color = Color.BLACK;
-        } else if (n.color == Color.BLACK && (n.right == null || n.right.color == Color.BLACK)
-                && (n.left == null || n.left.color == Color.BLACK)) {
-
-            Node r = replaceNode(n, new Node(Color.DOUBLEBLACK));
-            r.left = n.left;
-            r.right = n.right;
-            dbOne(r);
-        }
-    }
-
-    /**
-     * terminal
-     * node is root && doubleblack
-     *
-     * @param n
-     */
-    private void dbOne(Node n) {
-
-        if (n == root) {
-
+        Node y = n;
+        Node x;
+        Color originalColor = y.color;
+        if (n.left == null) {
+            x = n.right;
+            replaceNode(n, n.right);
+        } else if (n.right == null) {
+            x = n.left;
+            replaceNode(n, n.left);
         } else {
-            dbTwo(n);
-        }
-    }
+            y = n.successor();
+            if (y != null) {
+                originalColor = y.color;
+                x = y.right;
+            } else {
+                originalColor = Color.BLACK;
+                x = null;
+            }
 
-    /**
-     * node is doubleblack
-     * sibling is red
-     * parent is black
-     *
-     * @param n
-     */
-    private void dbTwo(Node n) {
-
-        if (n.sibling() != null && n.sibling().color == Color.RED && n.parent.color == Color.BLACK) {
-
-        }
-        dbThree(n);
-    }
-
-    /**
-     * node is doubleblack
-     * sibling is black with black children
-     * parent is black
-     *
-     * @param n
-     */
-    private void dbThree(Node n) {
-
-        if (n.sibling() != null && n.sibling().color == Color.BLACK && n.parent.color == Color.BLACK
-                && (n.sibling().right == null || n.sibling().right.color == Color.BLACK)
-                && (n.sibling().left == null || n.sibling().left.color == Color.BLACK)) {
-
-        }
-        dbFour(n);
+            if (y != null && y.parent == n) {
+                x.parent = y;
+            } else if (y != null) {
+                replaceNode(y, y.right);
+                y.right = n.right;
+                y.right.parent = y;
+            }
+            replaceNode(n, y);
+            y.left = n.left;
+            y.left.parent = y;
+            y.color = n.color;
+//        }
+//        if (originalColor == Color.BLACK) {
+//            deleteAdjust(x);
+//        }
     }
 
 
-    /**
-     * terminal
-     * node is double black
-     * parent is red
-     * sibling is black with black children
-     */
-    private void dbFour(Node n) {
+    private void deleteAdjust(Node n) {
+        while (n != null && n != root && n.color != Color.BLACK) {
 
-        if (n.sibling() != null && n.sibling().color == Color.BLACK && n.parent.color == Color.RED
-                && (n.sibling().right == null || n.sibling().right.color == Color.BLACK)
-                && (n.sibling().left == null || n.sibling().left.color == Color.BLACK)) {
+            if (n == n.parent.left) {
 
-            n.sibling().color = Color.RED;
-            n.parent.color = Color.BLACK;
-            n.parent.left = n.right;
-            n.right.parent = n.parent;
-        } else {
-            dbFive(n);
+                Node w = n.parent.right;
+                if (w != null && w.color == Color.RED) {
+                    w.color = Color.BLACK;
+                    n.parent.color = Color.RED;
+                    restructure(n.parent);
+                    w = n.parent.right;
+                }
+
+                if (w != null && w.left != null && w.left.color == Color.BLACK && w.right.color == Color.BLACK) {
+                    w.color = Color.RED;
+                    n = n.parent;
+                } else if (w != null){
+                    if (w.right.color == Color.BLACK) {
+                        w.left.color = Color.BLACK;
+                        w.color = Color.RED;
+                        restructure(w);
+                        w = n.parent.right;
+                    }
+
+                    w.color = n.parent.color;
+                    n.parent.color = Color.BLACK;
+                    w.right.color = Color.BLACK;
+                    restructure(n);
+                    n = root;
+                }
+            } else {
+                Node w = n.parent.left;
+                if (w != null && w.color == Color.RED) {
+                    w.color = Color.BLACK;
+                    n.parent.color = Color.RED;
+                    restructure(n.parent);
+                    w = n.parent.left;
+                }
+
+                if (w != null && w.right != null && w.right.color == Color.BLACK && w.left.color == Color.BLACK) {
+                    w.color = Color.RED;
+                    n = n.parent;
+                } else if (w != null){
+                    if (w.left.color == Color.BLACK) {
+                        w.right.color = Color.BLACK;
+                        w.color = Color.RED;
+                        restructure(w);
+                        w = n.parent.left;
+                    }
+                    w.color = n.parent.color;
+                    n.parent.color = Color.BLACK;
+                    w.left.color = Color.BLACK;
+                    restructure(n);
+                    n = root;
+                }
+            }
         }
     }
 
-    /**
-     * node is doublblack
-     * parent is black
-     * sibling is black with one red left child
-     * && one black right child
-     *
-     * @param n
-     */
-    private void dbFive(Node n) {
 
-        if (n.sibling() != null && n.sibling().color == Color.BLACK && n.parent.color == Color.BLACK
-                && n.sibling().left != null && n.sibling().left.color == Color.RED
-                && n.sibling().right != null && n.sibling().right.color == Color.BLACK) {
-
-        }
-
-        dbSix(n);
-    }
-
-    /**
-     * terminal
-     * node is doubleblack
-     * parent is ambiguous
-     * sibling is black with one red right child
-     * other child of sibling is ambiguous
-     *
-     * @param n
-     */
-    private void dbSix(Node n) {
-
-        if (n.sibling() != null && n.sibling().color == Color.BLACK
-                && n.sibling().right != null && n.right.color == Color.RED && n.sibling().left != null) {
-
-            n = leftRotation(n.sibling(), n.sibling().parent, n.sibling().parent.parent);
-            n.color = n.left.color;
-            n.left.color = Color.BLACK;
-            n.left.left = null;
-        } else if (n.sibling() != null && n.sibling().color == Color.BLACK
-                && n.sibling().left != null && n.left.color == Color.RED && n.sibling().right != null) {
-
-            n = rightRotation(n.parent, n.parent.parent, n.parent.parent.parent);
-        }
-    }
 
     //do successors need to match the color of their counterparts???
     private Node swapSuccessor(Node n) {

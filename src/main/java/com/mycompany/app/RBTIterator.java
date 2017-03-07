@@ -33,7 +33,7 @@ class RBTIterator<T extends Comparable> implements Iterator {
     }
 
     @Override
-    public Comparable next() {
-        return inOrder.pop().value;
+    public Node next() {
+        return inOrder.pop();
     }
 }

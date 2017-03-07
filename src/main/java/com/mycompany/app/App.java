@@ -42,14 +42,40 @@ public class App {
 
         Iterator I = tree.iterator();
 
-        System.out.print("{");
-        while (I.hasNext()) {
-            System.out.print(I.next() + ", ");
-        }
-        System.out.println("}");
+        print(tree);
 
         System.out.println(maxDepth(tree.root));
 
+        tree.remove(6);
+        print(tree);
+
+        System.out.println(maxDepth(tree.root));
+
+        tree.remove(101);
+        print(tree);
+
+        System.out.println(maxDepth(tree.root));
+
+        tree.remove(0);
+        print(tree);
+
+        System.out.println(maxDepth(tree.root));
+
+        tree.remove(44);
+        print(tree);
+
+        System.out.println(maxDepth(tree.root));
+    }
+
+
+    private static void print(RBTreeSet s) {
+        Iterator iterator = s.iterator();
+        System.out.print("{");
+        while(iterator.hasNext()) {
+            Node<Integer> x = (Node<Integer>)iterator.next();
+            System.out.print(x.value + x.color.toString() + ", ");
+        }
+        System.out.println("}");
     }
 
     private static int maxDepth(Node<Integer> root) {
